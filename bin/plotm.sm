@@ -1,0 +1,300 @@
+plotm 5
+##########################
+# $1  bb,r,en,t,dm,vx,vy,bx,by,bz
+# $2=0 dead zone integral, =1 active layer integral, =2 total integral
+# $3=1, x direction sectional plane $4=?ny, want total $4=0
+# $3=2, y direction sectional plane $4=?nx 
+# $5=0,  connect, $5==1, connect,log
+
+	macro read rdreads.m
+#	macro read twod.m
+	rdbasic 0 0 -1
+	erase
+	lweight 2
+	expand 1.5
+	rd dump0060.dat
+	set dm=r*vx*x12
+        if($1=="r"){set r=r/1.87*50}	
+	if($1=="bb"&&$5==0){plot t 1 $2 $3 $4 0 1}
+        if($1=="bb"&&$5==1){plot t 1 $2 $3 $4 3 1}
+        if($1!="bb"){
+                 if($5==0){plot $1 1 $2 $3 $4 0 0}
+                 if($5==1){plot $1 1 $2 $3 $4 3 0}
+        }
+
+#	if($1=="t"){
+#	data fuoriin.dat
+#	read {rad 1 teff 2}
+#	set rad=lg(rad*2.8/215)
+#	if($5==1){set teff=lg(teff)}
+#        connect rad teff
+#	}
+
+	do i=20,60,5 {
+		if ($i<1000) {define name "dump0""$!i"".dat"}
+                if ($i<100){define name "dump00""$!i"".dat"}
+                if ($i<10) {define name "dump000""$!i"".dat"}
+		rd "$!name"
+		if($1=="r"){set r=r/1.87*50}
+		set dm=r*vx*x12
+		if($1=="bb"&&$5==0){plot t 1 $2 $3 $4 1 1}
+		if($1=="bb"&&$5==1){plot t 1 $2 $3 $4 4 1}
+		if($1!="bb"){
+		 if($5==0){plot $1 1 $2 $3 $4 1 0}
+	         if($5==1){plot $1 1 $2 $3 $4 4 0}
+		}
+	enddo
+
+	}
+
+dm
+        rd 0_loss.dat
+        set dimen(dm)=dimen(min1)
+        do i=1,dimen(min1)-1{
+         set dm[$i]=(min1[$i]-min1[$i-1])/(t[$i]-t[$i-1])
+        }
+        set dm[0]=min1[0]/t[0]
+        set dm=dm/5.3*2e-4
+        expand 1.5
+        lweight 3
+	set t=t/2/3.1415926+200.
+	limits t dm
+	box
+	connect t dm
+        xlabel T(yr)
+        ylabel dm (msun/yr)
+
+dm2	rd 0_loss.dat
+        set dimen(dm)=dimen(min1)
+        do i=1,dimen(min1)-1{
+         set dm[$i]=(min1[$i]-min1[$i-1])/(t[$i]-t[$i-1])
+        }
+        set dm[0]=min1[0]/t[0]
+        set dm=dm/5.3*2e-4
+	set lgdm=lg(dm)
+        expand 1.5
+        lweight 3
+	limits 0 2000 -10 -3
+	box
+	connect t lgdm
+        xlabel T(yr)*2pi
+        ylabel lg(dm) (msun/yr)
+
+dm3
+        rd 0_loss.dat
+        set dimen(dm)=dimen(min1)
+        do i=1,dimen(min1)-1{
+         set dm[$i]=(min1[$i]-min1[$i-1])/(t[$i]-t[$i-1])
+        }
+        set dm[0]=min1[0]/t[0]
+        set dm=dm/5.3*2e-4
+        expand 1.5
+        lweight 3
+        limits 0.3 0.5 -2.5e-5 3.5e-4
+	set tyr=t/2./3.14159
+        connect tyr dm
+	expand 2.
+	relocate 140 3.e-4
+	label AllVis 
+	relocate 140 2.7e-4
+	label 80*200
+        xlabel T(yr)
+        ylabel dm (msun/yr)
+        box
+
+ini
+	plot r 1 2 1 0 0 0
+	set radi=outputradius
+	set sig=output*-1./1.87*50.*2.
+	plot t 1 2 1 199 0 0
+	set tc=output*-1.
+	plot bx 1 2 1 199 0 0
+	set alpha=output*-1.
+#	do i=0,dimen(radi)-1{
+	print ini2d '%10.3e %10.3e %10.3e %10.3e \n' {radi sig tc alpha}
+#	} 
+
+plot 7
+##########################
+# $1 $2 r,en,pot,vx,vy,vz or 1.(only need integrated value instead of flux)
+# $3=0 dead zone integral,$3=1 active layer integral, $3=2 total integral
+# $4=1, x direction sectional plane $5=?ny, want total $5=0
+# $4=2, y direction sectional plane $5=?nx 
+# $6=0, pl  $6=1, connect, $6==2, points $6==3, pl,lgy $6==4, connect,lgy $6==5, points pl,lgy $6==6, pl,-y
+# $7=1,blackbody
+        # setup index
+	lweight 3
+	expand 1.5
+        set ii=0,$nx*$ny-1,1
+        set indexi=INT(ii%$nx)
+        set indexj=INT((ii%($nx*$ny))/$nx)
+        set indexk=INT(ii/($nx*$ny))
+	set t=en/r*164782.
+# assume input is density (say mass density) so want to integrate up to get mass.
+
+        if($3 == 0) {set volume = x12*dx22*con}
+        if($3 == 1)  {set volume = x12*dx22*(1.-con)}
+        if($3 == 2)  {set volume = x12*dx22}
+
+        if($4==2){
+        set output=0,$ny-1
+        set output=output*0
+        set outputradius=0,$ny-1
+        set outputradius=outputradius*0
+
+                do j=0,$ny-1,1 {
+            set myinput = $1*volume*$2
+            set myuse = ($j==indexj) ? 1 : 0
+            set inputused=myinput if(myuse)
+                if($5!=0){
+                        set myuse=($j==indexj&&$5==indexi)?1:0
+                        set inputused=$1 if(myuse)
+                        }
+            set output[$j]=SUM(inputused)
+                }
+            set outputradius=x22 if (indexi==0&&indexk==0)
+            set lgoutput=lg(output)
+                if($6==0) {
+			lweight 4
+			expand 1.5
+			limits outputradius output
+			box
+			connect outputradius output}
+                if($6==1) {connect outputradius output}
+                if($6==2){ points outputradius output}
+                if($6==3) {
+			lweight 4
+                        expand 1.5
+                        limits outputradius lgoutput
+			box
+			connect outputradius lgoutput}
+                if($6==4) {connect outputradius lgoutput}
+                if($6==5){ points outputradius lgoutput}
+                set output=output*-1.
+                if($6==6){
+			lweight 4
+                        expand 1.5 
+                        limits outputradius output
+                        box
+			connect outputradius output}
+                if($5!=0){
+                        set a=x12 if(indexi==$5&&indexj==0&&indexk==0)
+                        print '%g'{a}
+                        }
+        }
+
+
+        if($4==1){
+# setup output array
+        set output=0,$nx-1
+        set output=output*0
+        set outputradius=0,$nx-1
+        set outputradius=outputradius*0
+
+
+# Loop over radius
+
+                do i=0,$nx-1,1 {
+
+            # setup true function to sum up
+            set myinput = $1*volume*$2
+            # setup shell conditional
+            set myuse = ($i==indexi) ? 1 : 0
+            set inputused = myinput if(myuse)
+                if($5!=0){
+                        set myuse=($i==indexi&&$5==indexj)?1:0
+			if($7==1){
+			set inputused=t if(myuse)
+			}else{
+                        set inputused=$1 if(myuse)
+			}
+                }
+
+
+            # get input only on shell
+            # get SUM of shell and store in output
+            set output[$i] = SUM(inputused)
+                }
+
+
+	
+	if($7==1){
+	    set dv=0,$nx-1
+            set dv=dv*0.
+	    set dv=2.*3.14*x12*dx12 if(indexj==0&&indexk==0)
+	    set xhcont=6.625e-27
+	    set xkcont=1.38e-16
+	    set xccont=3.e10
+	    define nwave 100
+	    set wave=0.,$nwave-1.
+	    set wave=wave*0.
+	    set bbwave=0.,$nwave-1.
+            set bbwave=bbwave*0.
+	    do i=0,$nwave-1{
+		set wave[$i]=($i.+1.)/10.
+	    }
+	    set wlcm=wave*1.e-4
+	    do i=0,$nwave-1{
+		set bbw=2.*xhcont*xccont**2/wlcm[$i]**5/(exp(xhcont*xccont/wlcm[$i]/xkcont/output)-1.)*dv
+		set bbwave[$i]=SUM(bbw)
+	    }
+	    set lgwave=lg(wave)
+	    set lgbbwave=lg(bbwave)
+	    if($6==0){
+		lweight 4
+                        expand 1.5 
+                        limits  lgwave bbwave
+                        box
+		connect lgwave bbwave}
+            if($6==1){connect lgwave bbwave}
+            if($6==2){points lgwave bbwave}
+            if($6==3){
+		lweight 4
+                        expand 1.5 
+                        limits lgwave lgbbwave
+                        box
+
+		connect lgwave lgbbwave}
+            if($6==4){connect lgwave lgbbwave}
+            if($6==5){points lgwave lgbbwave}
+
+
+
+	}else{
+            # get radius at each shell
+            set outputradius=x12 if(indexj==0&&indexk==0)
+
+            set lgoutputradius=lg(outputradius)
+            set lgoutput=lg(output)
+                if($6==0) {
+			lweight 4
+                        expand 1.5 
+                        limits lgoutputradius output
+                        box
+			connect lgoutputradius output}
+                if($6==1) {connect lgoutputradius output}
+                if($6==2){ points lgoutputradius output}
+                if($6==3) {
+			lweight 4
+                        expand 1.5 
+                        limits lgoutputradius lgoutput
+                        box
+			connect lgoutputradius lgoutput}
+                if($6==4) {connect lgoutputradius lgoutput}
+                if($6==5){ points lgoutputradius lgoutput}
+                set output=output*-1.
+                if($6==6){
+		lweight 4
+                        expand 1.5
+                        limits lgoutputradius output
+                        box
+		connect lgoutputradius output}
+
+                 if($5!=0){
+                        set a=x22 if(indexj==$5&&indexi==0&&indexk==0)
+                        print '%g'{a}
+                        }
+	}
+        }
+
+

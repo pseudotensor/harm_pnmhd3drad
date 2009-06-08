@@ -1,0 +1,14 @@
+#!/bin/csh
+#PBS -V 
+#PBS -N smallinner
+#PBS -l nodes=8:ppn=4
+#PBS -o ./log
+#PBS -e ./err
+
+echo `cat $PBS_NODEFILE`
+setenv NPROCS `wc -l < $PBS_NODEFILE`
+echo This job has allocated $NPROCS cpus
+echo host is $HOST
+cd /home/zhuzh/star/code/ZEUSJM/code/coolKai/a2bursts/smallinner/jonathan/bin
+uniq $PBS_NODEFILE > mpihosts
+mpirun  ./mhd3d 8 4 1 > mpirun.log

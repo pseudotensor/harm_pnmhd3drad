@@ -1,0 +1,149 @@
+#
+# to copy file
+# scp jon@kerr.physics:/home/jon/research/current/filename .
+# scp jon@kerr.physics:/home/jon/research/current/makefile.o2k .
+
+#General env. vars
+RM = rm -f
+SUFF = c
+#
+# Define a cpp source file directory, a fortran file subdirectory,
+# an object file subdirectory and an executable file subdirectory
+#
+SRCD = .
+OBJD = .
+OBJD2 = ./Obj
+BIND = ./bin
+
+CMD = $(BIND)/mhd3d
+
+PREP = prep
+FINISH = finish
+
+
+#LDFLAGS = -lfastm -lm
+# add -lmpi for mpi
+LDFLAGS = -lfastm -lm -lmpi
+#CFLAGS2 = -arch sgi
+#CFLAGS3 =
+#CDEBUG = -g
+# for profiling use speedshop or perfex
+#
+# what I found
+# The -Ofast=ip27 implies -r10000, -TARG:proc=r10000, and -TARG:platform=ip27
+# -n32 unless really need -64 for 2GB of memory space
+# compiler by default doesn't compile for ip27 machine, so must tell so specific opts are included for that machine
+# -OPT:alias=disjoint only valid if all pointers never point to overlapping memory addresses and any loop doesn't have an assigned value used later in the same loop(any iterative loop is dependent and so this would produce wrong code)
+# -TENV:X=4 advances speculative excecution to highest level, assumes no exceptions will occur(don't use, makes horribly slow)
+# fastest(for nonmpi)
+#CFLAGS = -n32 -r10000 -Ofast=ip27 -TARG:platform=ip27 -mips4 -LNO -IPA=on -OPT:IEEE_arithmetic=3 -OPT:roundoff=3 -OPT:alias=disjoint -LNO:vintr=on
+# need -64 for MPICH or addressing >4GB of memory, essentially just as fast
+CFLAGS = -64 -r10000 -Ofast=ip27 -TARG:platform=ip27 -mips4 -LNO -IPA=on -OPT:IEEE_arithmetic=3 -OPT:roundoff=3 -OPT:alias=disjoint -LNO:vintr=on -woff 1174,1552
+#
+# from princeton site
+#CFLAGS = -64 -mips4 -r10000 -TARG:platform=ip27 -Ofast=ip27 -OPT:IEEE_arithmetic=3 -OPT:roundoff=3 -OPT:alias=disjoint -IPA=on -LNO:vintr=on
+#The default is an R10000 Power Challenge, IP25.
+#The R10000 Origin is IP27. 
+
+CC=cc $(CFLAGS3) $(CFLAGS2) $(CDEBUG)
+# below only for MPICH!!  doesn't work with native mpi mpirun
+# use /usr/apps/MessPass/mpich/bin/mpirun -np NUMPROCS PROGRAM
+#CC=/usr/apps/MessPass/mpich/bin/mpicc  $(CFLAGS3) $(CFLAGS2) $(CFLAGS) $(CDEBUG)
+
+# use perfex -o perfout.txt -a -x -y ./twod    to see performance stats in file perfout.txt
+
+
+#
+# Define source files
+#
+SRCS = \
+$(SRCD)/analsol.$(SUFF) \
+$(SRCD)/boundrect1.$(SUFF) \
+$(SRCD)/boundgen1.$(SUFF) \
+$(SRCD)/boundgensimple1.$(SUFF) \
+$(SRCD)/boundmpi.$(SUFF) \
+$(SRCD)/diag.$(SUFF) \
+$(SRCD)/diagflux.$(SUFF) \
+$(SRCD)/init.$(SUFF) \
+$(SRCD)/main.$(SUFF) \
+$(SRCD)/gpar.$(SUFF) \
+$(SRCD)/numerics.$(SUFF) \
+$(SRCD)/ranc.$(SUFF) \
+$(SRCD)/stepgen.$(SUFF) \
+$(SRCD)/step2d.$(SUFF) \
+$(SRCD)/stepmag.$(SUFF) \
+$(SRCD)/sweep.$(SUFF) \
+$(SRCD)/dqcalc.$(SUFF) \
+$(SRCD)/timestep.$(SUFF) \
+$(SRCD)/utilfun.$(SUFF) \
+$(SRCD)/steptvdlf.$(SUFF)
+
+#
+# Define object files
+#                                         
+OBJS = \
+$(OBJD)/analsol.o \
+$(OBJD)/boundrect1.o \
+$(OBJD)/boundgen1.o \
+$(OBJD)/boundgensimple1.o \
+$(OBJD)/boundmpi.o \
+$(OBJD)/diag.o \
+$(OBJD)/diagflux.o \
+$(OBJD)/init.o \
+$(OBJD)/main.o \
+$(OBJD)/gpar.o \
+$(OBJD)/numerics.o \
+$(OBJD)/ranc.o \
+$(OBJD)/stepgen.o \
+$(OBJD)/step2d.o \
+$(OBJD)/stepmag.o \
+$(OBJD)/sweep.o \
+$(OBJD)/dqcalc.o \
+$(OBJD)/timestep.o \
+$(OBJD)/utilfun.o \
+$(OBJD)/steptvdlf.o
+
+
+#
+all: 	$(PREP) $(OBJD) $(BIND) $(CMD) $(FINISH)
+#
+
+$(PREP):
+	( sh ./makedecs.h.sh )
+
+$(OBJD):
+	mkdir $(OBJD)
+
+$(BIND):
+	mkdir $(BIND)
+
+$(CMD): $(OBJS) $(SRCS) makefile.o2k
+	$(CC) $(CFLAGS) -o $(CMD) $(OBJS) $(LDFLAGS)
+
+$(FINISH):
+	#( touch twodcode.tgz )
+	#( rm twodcode.tgz )
+	#tar cvzf $(OBJD)/twodcode.tgz *
+
+
+# dependencies
+$(OBJS)	: $(SRCD)/defs.h $(SRCD)/global.h $(SRCD)/global2dsup.h $(SRCD)/global3dsup.h $(SRCD)/makefile
+
+$(OBJD)/timestep.o : $(SRCD)/timestep.h
+$(OBJD)/boundrect1.o : $(SRCD)/boundrect.h $(SRCD)/boundpos.h $(SRCD)/bound.h
+$(OBJD)/boundgen1.o : $(SRCD)/boundgen.h $(SRCD)/bound.h
+$(OBJD)/boundgensimple1.o : $(SRCD)/boundgen.h $(SRCD)/bound.h
+$(OBJD)/boundmpi.o : $(SRCD)/bound.h
+$(OBJD)/diag.o : $(SRCD)/imageloophead.h $(SRCD)/imageloopinside.h $(SRCD)/diag.h
+$(OBJD)/stepgen.o : $(SRCD)/step.h
+$(OBJD)/step2d.o : $(SRCD)/step.h
+$(OBJD)/stepmag.o : $(SRCD)/step.h
+
+
+
+cleandat:
+	$(RM) $(BIND)/*.dat $(BIND)/*.dat.ras
+ 
+clean:
+	$(RM) *.o $(CMD)
+

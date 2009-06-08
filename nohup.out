@@ -1,0 +1,153 @@
+/usr/bin/time: cannot run ./mhd3d: No such file or directory
+Command exited with non-zero status 127
+	Command being timed: "./mhd3d"
+	User time (seconds): 0.00
+	System time (seconds): 0.00
+	Percent of CPU this job got: 0%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.00
+	Average shared t/usr/bin/time: cannot run ./mhd3dext siz: No such file or directorye (kbyt
+es): Command exited with non-zero status 127
+0
+	Ave	Command being timed: "rage un./mhd3dshared"
+ data 	Ussize (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 0
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 0
+	Voluntary context switches: 0
+	Involuntary context switches: 0
+	Swaps: 0
+	File system inper uts: 0
+	File system outputs: 0
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 8192
+	Exit status: 127
+time (seconds): 0.00
+	System time (seconds): 0.00
+	Percent of CPU this job got: 0%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.00
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average tota/usr/bin/time: cannot run ./mhd3d: No such file or directory
+l size (kbytes): 0
+	Maximum resident set size (kbytes): 0
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 0
+	Voluntary context switches: 0
+	Involuntary context switches: 0
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 0
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 8192
+	Exit status: 127
+Command exited with non-zero status 127
+	Command being timed: "./mhd3d"
+	User time (seconds): 0.00
+	System time (seconds): 0.00
+	Percent of CPU this job got: 100%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.00
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 0
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 0
+	Voluntary context switches: 0
+	Involuntary context switches: 0
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 0
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered:/usr/bin/time: cannot run ./mhd3d: No such file or directory
+ 0
+	Command exited with non-zero status 127
+	Page Command being timed: "./mhd3ds"
+	Useizr tie (bme yte(ss):eco 8192nd
+	Exs)it : sta0.00
+	System time (seconds): 0.00
+	Percent of CPU this job got: 0%
+	Elapsed (wall clock) timetu (h:ms: 127
+m:ss or m:ss): 0:00.00
+	Average shared text size (kbytes): 0/usr/bin/time: cannot run ./mhd3d: No such file or directory
+Command exited with non-zero status 127
+
+	A	verCommage unsharand ebeindg tim daed: "ta ./mhd3d"
+	User time (seconds): 0.00
+	System time (seconds): 0.00
+	Percent of CPU this job got: 100%
+	Elapsed (wall size (kbclock)yt times)e (h: :mm:0
+	Ass overr m:agss): e s0:00.00
+	Avteragacke shared t siext sze ize (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident(kby set size (kbytes): 0
+	tes):Average resident s 0
+et size (kbytes	Aver): 0
+	Major age unsh(requiring I/Oared) page faults:  data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 0
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 0
+	Voluntary context switches: 0
+	Involuntary context switches: 0
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 0
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 8192
+	Exit status: 127
+0
+	Minor (reclaiming a frame) page faults: 0
+	Voluntary context switches: 0
+	Involuntary context switches: 0
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 0
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 8192
+	Exit status: 127
+/usr/bin/time: cannot run ./mhd3d: No such file or directory
+Command exited with non-zero status 127
+	Command being timed: "./mhd3d"
+	User time (seconds): 0.00
+	System time (seconds): 0.00
+	Percent of CPU this job got: 0%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.00
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 0
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0or (reclaiming a frame) page faults: 0
+	Voluntary context switches: 0
+	Involuntary context switches: 0
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 0
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 8192
+	Exit status: 127
+
+Received signal 2. (no core)
+
+Received signal 15. (no core)
