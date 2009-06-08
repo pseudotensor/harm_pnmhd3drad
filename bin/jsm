@@ -1,0 +1,3 @@
+#!/bin/bash
+export TERM=vt100
+/home/zhuzh/star/program/sm/sminstal/bin/sm -m smstart -q $@

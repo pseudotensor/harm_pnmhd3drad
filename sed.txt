@@ -1,0 +1,1 @@
+s/#define NX 2048/#define NX 512/

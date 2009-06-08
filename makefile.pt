@@ -1,0 +1,142 @@
+#
+#
+#echo "Make sure MPICH params set in both global.h and makefile!"
+#echo "Make sure MPICH params set in both global.h and makefile!"
+USEINT=1
+USEPGI=0
+USEGCC=0
+USEKCC=0
+
+PREP = prep
+CMD=mhd3d
+
+
+
+ifeq ($(USEINT),1)
+CC = icc
+CFLAGS=-I/usr/local/vmi/mpich/include -O3 -tpp6 -axiMK -ipo -unroll -w1
+#CFLAGS=-I/usr/local/vmi/mpich/include -O2
+# LD_LIBRARY_PATH
+#LDFLAGS=-L/usr/local/vmi/mpich/lib/icc -lvml -lmpich -lvmi -ldl -lpthread
+# below works
+#LDFLAGS= -L/usr/local/vmi/mpich/lib/icc -lmpich -lvmi -ldl -lpthread
+# below for p3
+LDFLAGS=  -L/usr/local/vmi/mpich/lib/icc -lmpich -lvmi -ldl -lpthread
+# /usr/local/opt/intel/mkl/doc
+# Platinum is 1Ghz P3
+# icc compiler opts (icc -help)
+# -w2 or -r, show all warnings
+# -ax<i/M/K/W> i=ppro/p2 M=mmx K=SIMD W=P4 (needed when using -O3)
+# -x<""> ""
+# -ip, -ipo, -wp_ipo Interprocedural Opt (each higher opt)
+# (-wp_iponot allowed for my code)
+# -tpp7 for P4
+# -tpp6 for Ppro,P2,P3
+# -tpp5 for Pentium
+# -rcd fast float-to-int conversions
+# -unroll[n]
+# -prof_use : profiling data
+endif
+
+ifeq ($(USEPGI),1)
+CC = pgCC
+CFLAGS = -fast -Minline=levels:10 --no_exceptions
+LDFLAGS = -L/usr/local/vmi/mpich/lib/pgi -lm -lmpich -lvmi -ldl -lpthread -lblas -llapack
+endif
+
+ifeq ($(USEGCC),1)
+CC = gcc
+CFLAGS = -I/usr/local/vmi/mpich/include -Wall -O3 -ffast-math -finline-functions -funroll-loops
+LDFLAGS = -lm -L/usr/apps/math/lapack/intel -lblas_intel32 -llapack_intel32 -ltmglib_intel32 -L/usr/local/vmi/mpich/lib/gcc -lmpich -lvmi -ldl -lpthread
+endif
+
+ifeq ($(USEKCC),1)
+CC = /usr/apps/tools/kai/kcc4.0f2/KCC_BASE/bin/KCC
+CFLAGS = -I/usr/local/vmi/mpich/include
+LDFLAGS = -lm -L/usr/local/vmi/mpich/lib/gcc -lmpich -lvmi -ldl -lpthread  
+endif
+
+OBJD=.
+SRCD=.
+BIND=./bin
+
+
+# Define source files
+#
+SRCS = \
+$(SRCD)/analsol.$(SUFF) \
+$(SRCD)/boundrect1.$(SUFF) \
+$(SRCD)/boundgen1.$(SUFF) \
+$(SRCD)/boundgensimple1.$(SUFF) \
+$(SRCD)/boundmpi.$(SUFF) \
+$(SRCD)/diag.$(SUFF) \
+$(SRCD)/diagflux.$(SUFF) \
+$(SRCD)/gpar.$(SUFF) \
+$(SRCD)/init.$(SUFF) \
+$(SRCD)/main.$(SUFF) \
+$(SRCD)/numerics.$(SUFF) \
+$(SRCD)/ranc.$(SUFF) \
+$(SRCD)/stepgen.$(SUFF) \
+$(SRCD)/step2d.$(SUFF) \
+$(SRCD)/stepmag.$(SUFF) \
+$(SRCD)/sweep.$(SUFF) \
+$(SRCD)/dqcalc.$(SUFF) \
+$(SRCD)/timestep.$(SUFF) \
+$(SRCD)/utilfun.$(SUFF) \
+$(SRCD)/steptvdlf.$(SUFF) \
+#$(SRCD)/nrutil.$(SUFF)
+
+#
+# Define object files
+#                                         
+OBJS = \
+$(OBJD)/analsol.o \
+$(OBJD)/boundrect1.o \
+$(OBJD)/boundgen1.o \
+$(OBJD)/boundgensimple1.o \
+$(OBJD)/boundmpi.o \
+$(OBJD)/diag.o \
+$(OBJD)/diagflux.o \
+$(OBJD)/gpar.o \
+$(OBJD)/init.o \
+$(OBJD)/main.o \
+$(OBJD)/numerics.o \
+$(OBJD)/ranc.o \
+$(OBJD)/stepgen.o \
+$(OBJD)/step2d.o \
+$(OBJD)/stepmag.o \
+$(OBJD)/sweep.o \
+$(OBJD)/dqcalc.o \
+$(OBJD)/timestep.o \
+$(OBJD)/utilfun.o \
+$(OBJD)/steptvdlf.o \
+#$(OBJD)/nrutil.o
+
+all:	$(PREP) $(CMD)
+
+
+$(PREP):
+	( sh ./makedecs.h.sh )
+
+$(CMD):	$(OBJS) makefile.pt
+	$(CC) $(CFLAGS) -o $(BIND)/$(CMD) $(OBJS) $(LDFLAGS)
+
+
+# dependencies
+$(OBJS) : $(SRCD)/defs.h $(SRCD)/global.h $(SRCD)/global2dsup.h $(SRCD)/global3dsup.h $(SRCD)/makefile
+
+$(OBJD)/timestep.o : $(SRCD)/timestep.h
+$(OBJD)/boundrect1.o : $(SRCD)/boundrect.h $(SRCD)/boundpos.h $(SRCD)/bound.h
+$(OBJD)/boundgen1.o : $(SRCD)/boundgen.h $(SRCD)/bound.h
+$(OBJD)/boundgensimple1.o : $(SRCD)/boundgen.h $(SRCD)/bound.h
+$(OBJD)/boundmpi.o : $(SRCD)/bound.h
+$(OBJD)/diag.o : $(SRCD)/imageloophead.h $(SRCD)/imageloopinside.h $(SRCD)/diag.h
+$(OBJD)/stepgen.o : $(SRCD)/step.h
+$(OBJD)/step2d.o : $(SRCD)/step.h
+$(OBJD)/stepmag.o : $(SRCD)/step.h
+
+cleandat:
+	$(RM) $(BIND)/*.dat $(BIND)/*.dat.ras
+ 
+clean:
+	$(RM) *.o $(BIND)/$(CMD)

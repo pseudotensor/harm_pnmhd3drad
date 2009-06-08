@@ -1,0 +1,60 @@
+#!/bin/csh
+#
+#  Sample Batch Script for a Platinum cluster job
+#
+#  Submit this script using the command: qsub batch.sample
+#
+#  Use the "qstat" command to check the status of a job.
+#
+# The following are embedded QSUB options. The syntax is #PBS (the # does
+# _not_  denote that the lines are commented out so do not remove).
+#
+# resource limits  walltime: maximum wall clock time (hh:mm:ss)
+#                  nodes: number of 2-processor nodes
+#                  ppn: how many processors per node to use (1 or 2)
+#                      (you are always charged for the entire node)
+#                  pt: production Platinum cluster nodes
+#PBS -l walltime=00:30:00,nodes=4:ppn=2:pt
+#
+# queue name
+#PBS -q debug
+#
+# export all my environment variables to the job
+#PBS -V
+#
+# Charge job to project abc (recommended for users with multiple projects)
+# [If project is invalid, a valid project will be automatically selected]
+#PBS -A abc
+# 
+# job name (default = name of script file)
+#PBS -N testjob
+#
+# filename for standard output (default = <job_name>.o<job_id>)
+#PBS -o testjob.o
+# 
+# combine standard output and standard error (optional)
+#PBS -j oe
+#
+# send mail when the job begins and ends (optional)
+#PBS -m be
+# End of embedded QSUB options
+
+#set echo               # echo commands before execution; use for debugging
+
+# Create the scratch directory for the job and cd to it
+setenv SCR `set_SCR`
+if ($SCR != "") cd $SCR
+
+# Get files su3_rmd-pt and input.8.10 from directory in UniTree
+msscmd cd sample,get input.8.10,get su3_rmd-pt 
+
+chmod u+x su3_rmd-pt # Since UniTree gives you the same permissions as 
+                     # what your umask is set to (generally only read 
+                     # and write), you need to give yourself
+                     # executable permission to run su3_rmd-pt
+
+# Run the MPI program on all nodes/processors requested by the job
+vmirun "su3_rmd-pt < input.8.10 > output.8.10"
+
+# After the job is done, save the output file to UniTree
+msscmd put output.8.10

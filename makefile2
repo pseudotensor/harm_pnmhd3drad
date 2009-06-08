@@ -1,0 +1,151 @@
+####################################
+## altix options
+#CC        = gcc
+#FC        = ifort
+#LDR       = ifort
+#PP        = ifort
+#PP_OPTS   = -free
+##FC_OPTS   = -c -O0 -fpe0 -zero  -u -check arg_temp_created -check bounds -traceback
+#FC_OPTS   = -c -O3 -zero -u -ipo -IPF_fma 
+##LDR_OPTS  = -O0  -fpe0 -u -zero  -check arg_temp_created -check bounds -traceback
+#LDR_OPTS  = -O3 -zero -u -ipo -IPF_fma 
+#INCS      =
+#LIBS      = -lmpi
+####################################
+## umich cluster
+CCM       = /usr/bin/mpicc
+FC        = /usr/bin/mpif90
+LDR       = /usr/bin/mpif90
+PP        = /usr/bin/mpif90
+CC_OPTS   = -Ofast 
+PP_OPTS   = -ftpp -freeform -fno-preprocessed -extend_source
+#FC_OPTS   = -c -O0 -u -C -ffortran-bounds-check -fno-permissive -fullwarn -g -keep -LANG:formal_deref_unsafe=ON -trapuv -Wdiv-by-zero
+FC_OPTS   = -c -O3 -u -ipa -mtune=auto
+#LDR_OPTS  = -O0 -u -C -ffortran-bounds-check -fno-permissive -fullwarn -g -keep -LANG:formal_deref_unsafe=ON -trapuv -Wdiv-by-zero
+LDR_OPTS  = -O3 -u -ipa -mtune=auto
+INCS      =
+LIBS      = 
+LDFLAGS   = -lm
+####################################
+
+SRCD = .
+OBJD = .
+BIND = ./bin
+SUFF = c
+
+EXEC      = $(BIND)/mhd3d
+PROBOBJ   = 
+PROBSRC   =
+
+CC= $(CCM) $(CC_OPTS)
+
+.SUFFIXES: .c .o
+#.c.o:
+#	$(COMD) $(SRCS)
+
+#define source files
+SRCS = \
+$(SRCD)/analsolmpi.$(SUFF) \
+$(SRCD)/boundrect1.$(SUFF) \
+$(SRCD)/boundgen1.$(SUFF) \
+$(SRCD)/boundgensimple1.$(SUFF) \
+$(SRCD)/boundmpi.$(SUFF) \
+$(SRCD)/bound1Dmpi.$(SUFF) \
+$(SRCD)/diag.$(SUFF) \
+$(SRCD)/diagflux.$(SUFF) \
+$(SRCD)/gpar.$(SUFF) \
+$(SRCD)/init.$(SUFF) \
+$(SRCD)/main.$(SUFF) \
+$(SRCD)/numerics.$(SUFF) \
+$(SRCD)/ranc.$(SUFF) \
+$(SRCD)/stepgensubmpi5.$(SUFF) \
+$(SRCD)/step2d.$(SUFF) \
+$(SRCD)/stepmag.$(SUFF) \
+$(SRCD)/sweep.$(SUFF) \
+$(SRCD)/dqcalc.$(SUFF) \
+$(SRCD)/timestep.$(SUFF) \
+$(SRCD)/utilfun.$(SUFF) \
+$(SRCD)/steptvdlf.$(SUFF) \
+$(SRCD)/sigactmpi.$(SUFF) \
+$(SRCD)/fld.c \
+$(SRCD)/initrad.c \
+$(SRCD)/mprops.c \
+$(SRCD)/radstart.c \
+$(SRCD)/gradv.c \
+$(SRCD)/moment.c \
+$(SRCD)/linpck.c \
+$(SRCD)/riccg.c \
+$(SRCD)/bvalrad.c \
+$(SRCD)/derivs.c \
+$(SRCD)/rhs.c \
+$(SRCD)/iccgaf.c \
+$(SRCD)/opac.c \
+
+
+
+OBJS      = \
+analsolmpi.o \
+boundrect1.o \
+boundgen1.o \
+boundgensimple1.o \
+boundmpi.o \
+bound1Dmpi.o \
+diag.o \
+diagflux.o \
+gpar.o \
+init.o \
+main.o \
+numerics.o \
+ranc.o \
+stepgensubmpi5.o \
+step2d.o \
+stepmag.o \
+sweep.o \
+dqcalc.o \
+timestep.o \
+utilfun.o \
+steptvdlf.o \
+sigactmpi.o \
+fld.o \
+initrad.o \
+mprops.o \
+radstart.o \
+gradv.o \
+moment.o \
+linpck.o \
+riccg.o \
+bvalrad.o \
+derivs.o \
+rhs.o \
+iccgaf.o \
+opac.o  ${PROBOBJ}
+
+compile: ${EXEC}
+
+#.c.o:
+#	$(COMD) $(SRCS)
+
+${EXEC}: ${OBJS} $(SRCS) makefile2
+	${CC} -o ${EXEC} ${OBJS} $(LDFLAGS)
+
+# dependencies
+$(OBJS) : $(SRCD)/defs.h $(SRCD)/global.h $(SRCD)/radiation.h $(SRCD)/radiation2.h $(SRCD)/global2dsup.h $(SRCD)/global3dsup.h $(SRCD)/mytime.h $(SRCD)/makefile2
+
+$(OBJD)/timestep.o : $(SRCD)/timestep.h
+$(OBJD)/boundrect1.o : $(SRCD)/boundrect.h $(SRCD)/boundpos.h $(SRCD)/bound.h
+$(OBJD)/boundgen1.o : $(SRCD)/boundgen.h $(SRCD)/bound.h
+$(OBJD)/boundgensimple1.o : $(SRCD)/boundgen.h $(SRCD)/bound.h
+$(OBJD)/boundmpi.o : $(SRCD)/bound.h
+$(OBJD)/bound1Dmpi.o : $(SRCD)/bound.h
+$(OBJD)/diag.o : $(SRCD)/imageloophead.h $(SRCD)/imageloopinside.h $(SRCD)/diag.h
+$(OBJD)/stepgensubmpi5.o : $(SRCD)/step.h
+$(OBJD)/step2d.o : $(SRCD)/step.h
+$(OBJD)/stepmag.o : $(SRCD)/step.h
+$(OBJD)/sweep.o : $(SRCD)/sweeppassive1.h $(SRCD)/sweeppassive2.h $(SRCD)/sweeppassive3.h
+
+
+${EXEC}.o: $(FOBJ:.o=.c)
+
+
+
+

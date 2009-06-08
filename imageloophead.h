@@ -1,0 +1,86 @@
+// output image using map, same for vectors below
+if((COORD==3)&&(SAMPLEI>0)&&(outtype>0)){
+  sliceloop=0;
+  sk=0;
+  ek=IMGN3;
+  sj=IMGN2-1;
+  ej=-1;
+  si=0;
+  ei=IMGN1;
+  iterj=-1;
+  iteri=1;
+  iterk=1;
+#if(0)
+  fprintf(stderr,"si: %d ei: %d sj: %d ej: %d sk: %d ek: %d\n",si,ei,sj,ej,sk,mcek); fflush(stderr);
+#endif
+}
+else{
+  sliceloop=0;
+  sk=0;
+  ek=IMGN3;
+  sj=0;
+  ej=IMGN2;
+  si=0;
+  ei=IMGN1;
+  iterj=1;
+  iteri=1;
+  iterk=1;
+}
+if(TILEIMAGE==0){
+  if(GENERALSLICE==0){
+    if(ndims==2){
+      if(PLOTAXIS==3){
+	k=sk;
+	j=sj;
+	i=si-iteri;
+      }
+      else if(PLOTAXIS==2){
+	k=sk;
+	j=sj;
+	i=si-iteri;
+      }
+      else if(PLOTAXIS==1){
+	k=sk;
+	j=sj-iterj;
+	i=si;
+      }
+    }
+    else if(ndims==3){
+      sk=0;
+      ek=IMGN3;
+      sj=0;
+      ej=IMGN2;
+      si=0;
+      ei=IMGN1;
+      iteri=1;
+      iterj=1;
+      iterk=1;
+      i=si-iteri;
+      j=sj;
+      k=sk;
+    }
+    sliceloop=0;
+  }
+  else{
+    sliceloop=0;
+    sjj=0;
+    sii=0;
+    eii=imagen1;
+    ejj=imagen2;
+    iterii=1;
+    iterjj=1;
+    jj=sjj;
+    ii=sii-iterii;
+  }
+}
+else{
+  sliceloop=0;
+  sjj=0;
+  sii=0;
+  eii=imagen1;
+  ejj=imagen2;
+  iterii=1;
+  iterjj=1;
+  jj=sjj;
+  ii=sii-iterii;
+}

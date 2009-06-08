@@ -1,0 +1,74 @@
+#include "zeus2d.def"
+c=======================================================================
+c////////////////////////////  FILE MPROPS  \\\\\\\\\\\\\\\\\\\\\\\\\\\\
+c
+c  PURPOSE:  This file contains subroutines which compute the material
+c  properties needed in the radiation hydrodynamics.  Each routine is
+c  independent, requires no common blocks (all data passed via
+c  arguments), and works on a vector whose starting and ending index
+c  are also input via arguments.  The routines include:
+c  EOS   - equation of state; computes gas pressure and derivative wrt e
+c  TEMP  - computes material temperature and derivative wrt e
+c  PLANCK- computes the frequency integrated Planck function and
+c              derivative wrt temp
+c  ABSORP - computes absorption coefficient and derivative wrt temp
+c  SCATT  - computes scattering coefficient
+c-----------------------------------------------------------------------
+c
+      subroutine eos(e,d,gam,istrt,iend,p,dpde)
+      implicit NONE
+      integer istrt,iend,i
+      REAL e(1),d(1),gam,p(1),dpde(1)
+      do 10 i=istrt,iend
+        p   (i) = (gam-1.0)*e(i)
+        dpde(i) =  gam-1.0
+10    continue
+      return
+      end
+c
+      subroutine temp(e,d,gam,istrt,iend,t,dtde)
+      implicit NONE
+      integer istrt,iend,i
+      REAL e(1),d(1),gam,t(1),mmw,gasc,dtde(1)
+      parameter(mmw=1.0)
+      parameter(gasc=8.625e7/mmw)
+      do 10 i=istrt,iend
+        t   (i) = (gam-1.0)*e(i)/(d(i)*gasc)
+        dtde(i) = (gam-1.0)     /(d(i)*gasc)
+10    continue
+      return
+      end
+c
+      subroutine planck(t,istrt,iend,b,db)
+      implicit NONE
+      integer istrt,iend,i
+      REAL t(1),b(1),sbc,db(1)
+      parameter(sbc=1.8044e-5)
+      do 10 i=istrt,iend
+        db(i) = sbc*t(i)**3
+         b(i) = db(i)*t(i)
+        db(i) = 4.0*db(i)
+10    continue
+      return
+      end
+c
+      subroutine absorp(t,d,istrt,iend,xe,dxe)
+      implicit NONE
+      integer istrt,iend,i
+      REAL t(1),d(1),xe(1),dxe(1)
+      do 10 i=istrt,iend
+         xe(i) = ABSORPTION
+        dxe(i) = D_ABSORPTION_DT
+10    continue
+      return
+      end
+c
+      subroutine scatt(t,d,istrt,iend,xe)
+      implicit NONE
+      integer istrt,iend,i
+      REAL t(1),d(1),xe(1)
+      do 10 i=istrt,iend
+         xe(i) = SCATTERING
+10    continue
+      return
+      end
